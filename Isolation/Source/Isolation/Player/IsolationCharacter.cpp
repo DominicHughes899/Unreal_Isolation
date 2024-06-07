@@ -30,6 +30,7 @@ void AIsolationCharacter::BeginPlay()
 	}
 }
 
+// ==== Input Functions ====
 void AIsolationCharacter::MoveForward(const FInputActionValue& Value)
 {
 	AddMovementInput(GetActorForwardVector(), Value.Get<float>());
@@ -38,6 +39,17 @@ void AIsolationCharacter::MoveForward(const FInputActionValue& Value)
 void AIsolationCharacter::MoveRight(const FInputActionValue& Value)
 {
 	AddMovementInput(GetActorRightVector(), Value.Get<float>());
+}
+
+void AIsolationCharacter::Look(const FInputActionValue& Value)
+{
+	FVector2D LookAxisVector = Value.Get<FVector2D>();
+
+	if (Controller != nullptr)
+	{
+		AddControllerYawInput(-LookAxisVector.X);
+		AddControllerPitchInput(LookAxisVector.Y);
+	}
 }
 
 // Called every frame
@@ -56,6 +68,7 @@ void AIsolationCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 	{
 		EnhancedInputComponent->BindAction(MoveForwardAction, ETriggerEvent::Triggered, this, &AIsolationCharacter::MoveForward);
 		EnhancedInputComponent->BindAction(MoveRightAction, ETriggerEvent::Triggered, this, &AIsolationCharacter::MoveRight);
+		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AIsolationCharacter::Look);
 	}
 }
 
