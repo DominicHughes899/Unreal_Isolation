@@ -31,6 +31,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UBoxComponent* InteractionDetectionBox;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class USceneComponent* AttachLocation;
+
 	// ==== Input Handlers ====
 	// Set in BP
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
@@ -45,12 +48,17 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	UInputAction* LookAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
+	UInputAction* InteractAction;
+
 	// ==== Input Functions ====
 	void MoveForward(const FInputActionValue& Value);
 
 	void MoveRight(const FInputActionValue& Value);
 
 	void Look(const FInputActionValue& Value);
+
+	void Interact(const FInputActionValue& Value);
 
 	// ==== Interaction ====
 	UFUNCTION()
@@ -60,6 +68,8 @@ protected:
 	void OnOverlapEnd(AActor* OverlappedActor, AActor* OtherActor);
 
 	TArray<IInteractionInterface*> InteractablesInRange;
+
+	IInteractionInterface* FocusedInteractable;
 
 
 public:	

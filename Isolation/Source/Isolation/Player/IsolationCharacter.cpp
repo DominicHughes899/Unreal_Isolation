@@ -24,6 +24,9 @@ AIsolationCharacter::AIsolationCharacter()
 	InteractionDetectionBox->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 	InteractionDetectionBox->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Overlap);
 
+	// Attach Location
+	AttachLocation = CreateDefaultSubobject<USceneComponent>(TEXT("AttachLocation"));
+	AttachLocation->SetupAttachment(RootComponent);
 
 
 }
@@ -69,6 +72,24 @@ void AIsolationCharacter::Look(const FInputActionValue& Value)
 	}
 }
 
+void AIsolationCharacter::Interact(const FInputActionValue& Value)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Interact Triggered"));
+
+	if (FocusedInteractable)
+	{
+		FocusedInteractable->Pickup(AttachLocation);
+		FocusedInteractable->Unfocus();
+
+		if (InteractablesInRange.Num() > 0)
+		{
+			InteractablesInRange.Remove(FocusedInteractable);
+			FocusedInteractable = nullptr;
+		}
+	}
+
+}
+
 void AIsolationCharacter::OnOverlapBegin(AActor* OverlappedActor, AActor* OtherActor)
 {
 	// Add Interactable to array
@@ -76,6 +97,13 @@ void AIsolationCharacter::OnOverlapBegin(AActor* OverlappedActor, AActor* OtherA
 	{
 		InteractablesInRange.Add(OverlappedInterface);
 
+		 
+		// Always Focus element 0
+		if (InteractablesInRange.Num() > 0)
+		{
+			FocusedInteractable = InteractablesInRange[0];
+			FocusedInteractable->Focus();
+		}
 	}
 }
 
@@ -87,8 +115,21 @@ void AIsolationCharacter::OnOverlapEnd(AActor* OverlappedActor, AActor* OtherAct
 
 	if (OverlappedInterface && InteractablesInRange.Num() > 0)
 	{
+		// Unfocus Current interactable
+
+		if (FocusedInteractable)
+		{
+			FocusedInteractable->Unfocus();
+		}
+
 		InteractablesInRange.Remove(OverlappedInterface);
 
+		// If still interactable in range, focus element 0
+		if (InteractablesInRange.Num() > 0)
+		{
+			FocusedInteractable = InteractablesInRange[0];
+			FocusedInteractable->Focus();
+		}
 	}
 }
 
@@ -109,6 +150,7 @@ void AIsolationCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 		EnhancedInputComponent->BindAction(MoveForwardAction, ETriggerEvent::Triggered, this, &AIsolationCharacter::MoveForward);
 		EnhancedInputComponent->BindAction(MoveRightAction, ETriggerEvent::Triggered, this, &AIsolationCharacter::MoveRight);
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AIsolationCharacter::Look);
+		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AIsolationCharacter::Interact);
 	}
 }
 

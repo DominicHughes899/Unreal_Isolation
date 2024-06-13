@@ -23,11 +23,28 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	// ==== Interface Functions ====
+	virtual void Focus() override;
+	virtual void Unfocus() override;
+	virtual void Pickup(USceneComponent* AttachLocation) override;
+
 	UPROPERTY(BlueprintReadOnly)
 	bool ShouldAnimate = true;
+
+	// ==== Blueprint Functions ====
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnFocus();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnUnfocus();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnPickup();
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+
 
 };

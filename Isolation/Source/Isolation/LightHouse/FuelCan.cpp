@@ -18,6 +18,25 @@ void AFuelCan::BeginPlay()
 	
 }
 
+void AFuelCan::Focus()
+{
+	OnFocus();
+}
+
+void AFuelCan::Unfocus()
+{
+	OnUnfocus();
+}
+
+void AFuelCan::Pickup(USceneComponent* AttachLocation)
+{
+	ShouldAnimate = false;
+
+	AttachToComponent(AttachLocation, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+
+	OnPickup();
+}
+
 // Called every frame
 void AFuelCan::Tick(float DeltaTime)
 {
