@@ -12,6 +12,8 @@
 class UInputMappingContext;
 class UInputAction;
 
+class IInteractionInterface;
+
 UCLASS()
 class ISOLATION_API AIsolationCharacter : public ACharacter
 {
@@ -24,6 +26,10 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	// ==== Components ====
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UBoxComponent* InteractionDetectionBox;
 
 	// ==== Input Handlers ====
 	// Set in BP
@@ -45,6 +51,15 @@ protected:
 	void MoveRight(const FInputActionValue& Value);
 
 	void Look(const FInputActionValue& Value);
+
+	// ==== Interaction ====
+	UFUNCTION()
+	void OnOverlapBegin(AActor* OverlappedActor, AActor* OtherActor);
+
+	UFUNCTION()
+	void OnOverlapEnd(AActor* OverlappedActor, AActor* OtherActor);
+
+	TArray<IInteractionInterface*> InteractablesInRange;
 
 
 public:	

@@ -7,11 +7,24 @@
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 
+#include "Components/BoxComponent.h"
+
+#include "../Interface/InteractionInterface.h"
+
 // Sets default values
 AIsolationCharacter::AIsolationCharacter()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	// Setup Components
+	// Interaction Detection Box
+	InteractionDetectionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("InteractionDetectionBox"));
+	InteractionDetectionBox->SetupAttachment(RootComponent);
+	InteractionDetectionBox->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+	InteractionDetectionBox->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Overlap);
+
+
 
 }
 
@@ -28,6 +41,10 @@ void AIsolationCharacter::BeginPlay()
 			Subsystem->AddMappingContext(PlayerMappingContext, 0);
 		}
 	}
+
+	// Bind Overlap Functions
+	OnActorBeginOverlap.AddDynamic(this, &AIsolationCharacter::OnOverlapBegin);
+	OnActorEndOverlap.AddDynamic(this, &AIsolationCharacter::OnOverlapEnd);
 }
 
 // ==== Input Functions ====
@@ -49,6 +66,29 @@ void AIsolationCharacter::Look(const FInputActionValue& Value)
 	{
 		AddControllerYawInput(-LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
+	}
+}
+
+void AIsolationCharacter::OnOverlapBegin(AActor* OverlappedActor, AActor* OtherActor)
+{
+	// Add Interactable to array
+	if (IInteractionInterface* OverlappedInterface = Cast<IInteractionInterface>(OtherActor))
+	{
+		InteractablesInRange.Add(OverlappedInterface);
+
+	}
+}
+
+void AIsolationCharacter::OnOverlapEnd(AActor* OverlappedActor, AActor* OtherActor)
+{
+	// Remove Interactable from array
+
+	IInteractionInterface* OverlappedInterface = Cast<IInteractionInterface>(OtherActor);
+
+	if (OverlappedInterface && InteractablesInRange.Num() > 0)
+	{
+		InteractablesInRange.Remove(OverlappedInterface);
+
 	}
 }
 
