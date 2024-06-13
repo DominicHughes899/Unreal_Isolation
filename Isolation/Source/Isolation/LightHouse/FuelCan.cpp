@@ -20,7 +20,10 @@ void AFuelCan::BeginPlay()
 
 void AFuelCan::Focus(bool HasFuel)
 {
-	OnFocus();
+	if (!HasFuel)
+	{
+		OnFocus();
+	}
 }
 
 void AFuelCan::Unfocus()

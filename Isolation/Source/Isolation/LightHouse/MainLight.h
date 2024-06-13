@@ -27,6 +27,7 @@ protected:
 	virtual void Unfocus() override;
 
 	virtual bool CheckTag(FName TagToCheck) override;
+	virtual void FillFuel() override;
 
 	// ==== Blueprint Functions ====
 	UFUNCTION(BlueprintImplementableEvent)
@@ -38,5 +39,11 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+private:
+	// ==== Fuel system ====
+	float MaxFuel;
+
+	float FuelLevel = MaxFuel/2;
 
 };

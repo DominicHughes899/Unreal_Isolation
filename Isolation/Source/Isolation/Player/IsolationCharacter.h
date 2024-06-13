@@ -70,6 +70,7 @@ protected:
 	TArray<IInteractionInterface*> InteractablesInRange;
 
 	IInteractionInterface* FocusedInteractable;
+	IInteractionInterface* HeldInteractable;
 
 	// ==== Carrying ====
 	bool CarryingFuel = false;

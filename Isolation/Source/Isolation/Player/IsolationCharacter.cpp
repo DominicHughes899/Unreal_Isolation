@@ -80,19 +80,31 @@ void AIsolationCharacter::Interact(const FInputActionValue& Value)
 
 		if (FocusedInteractable->CheckTag(FName("MainLight")))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("LightHouse Interacted"));
+			if (CarryingFuel)
+			{
+				CarryingFuel = false;
+
+				FocusedInteractable->FillFuel();
+				HeldInteractable->DestroyActor();
+
+				FocusedInteractable->Unfocus();
+			}
 		}
 		else
 		{
-			FocusedInteractable->Pickup(AttachLocation);
-			FocusedInteractable->Unfocus();
-
-			CarryingFuel = true;
-
-			if (InteractablesInRange.Num() > 0)
+			if(!CarryingFuel)
 			{
-				InteractablesInRange.Remove(FocusedInteractable);
-				FocusedInteractable = nullptr;
+				FocusedInteractable->Pickup(AttachLocation);
+				FocusedInteractable->Unfocus();
+				HeldInteractable = FocusedInteractable;
+
+				CarryingFuel = true;
+
+				if (InteractablesInRange.Num() > 0)
+				{
+					InteractablesInRange.Remove(FocusedInteractable);
+					FocusedInteractable = nullptr;
+				}
 			}
 		}
 		
@@ -142,6 +154,8 @@ void AIsolationCharacter::OnOverlapEnd(AActor* OverlappedActor, AActor* OtherAct
 		{
 			FocusedInteractable = InteractablesInRange[0];
 			FocusedInteractable->Focus(CarryingFuel);
+
+			
 		}
 	}
 }

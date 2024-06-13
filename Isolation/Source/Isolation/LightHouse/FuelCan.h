@@ -28,6 +28,8 @@ protected:
 	virtual void Unfocus() override;
 	virtual void Pickup(USceneComponent* AttachLocation) override;
 
+	virtual void DestroyActor() override { Destroy(); }
+
 	UPROPERTY(BlueprintReadOnly)
 	bool ShouldAnimate = true;
 

@@ -37,6 +37,9 @@ public:
 	virtual bool CheckTag(FName TagToCheck) { return false; }
 
 	UFUNCTION()
-	virtual void Interact(bool HasFuel) {}
+	virtual void FillFuel() {}
+
+	UFUNCTION()
+	virtual void DestroyActor() {}
 
 };

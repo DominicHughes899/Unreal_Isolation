@@ -34,6 +34,10 @@ bool AMainLight::CheckTag(FName TagToCheck)
 	return ActorHasTag(TagToCheck);
 }
 
+void AMainLight::FillFuel()
+{
+}
+
 // Called every frame
 void AMainLight::Tick(float DeltaTime)
 {
