@@ -36,6 +36,11 @@ bool AMainLight::CheckTag(FName TagToCheck)
 
 void AMainLight::FillFuel()
 {
+	FuelLevel += 0.4f;
+	if (FuelLevel >= 1.f)
+	{
+		FuelLevel = 1.f;
+	}
 }
 
 // Called every frame
@@ -43,5 +48,20 @@ void AMainLight::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	DrainFuel(DeltaTime);
+}
+
+void AMainLight::DrainFuel(float DeltaTime)
+{
+	if (FuelLevel >= 0)
+	{
+		FuelLevel -= DeltaTime * FuelEfficiency;
+	}
+	else
+	{
+		FuelLevel = 0;
+	}
+
+	OnDrainFuel(FuelLevel);
 }
 

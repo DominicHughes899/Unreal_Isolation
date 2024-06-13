@@ -36,14 +36,21 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnUnfocus();
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnDrainFuel(float CurrentLevel);							 // For UI overlay update
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 private:
 	// ==== Fuel system ====
-	float MaxFuel;
+	void DrainFuel(float DeltaTime);
 
-	float FuelLevel = MaxFuel/2;
+	float MaxFuel = 1.f;
+	float FuelLevel = 0.7f;
+
+	UPROPERTY(EditAnywhere)
+	float FuelEfficiency = 0.02f;
 
 };
