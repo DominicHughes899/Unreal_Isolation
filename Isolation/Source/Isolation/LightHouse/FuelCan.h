@@ -24,7 +24,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	// ==== Interface Functions ====
-	virtual void Focus() override;
+	virtual void Focus(bool HasFuel) override;
 	virtual void Unfocus() override;
 	virtual void Pickup(USceneComponent* AttachLocation) override;
 

@@ -18,7 +18,7 @@ void AFuelCan::BeginPlay()
 	
 }
 
-void AFuelCan::Focus()
+void AFuelCan::Focus(bool HasFuel)
 {
 	OnFocus();
 }

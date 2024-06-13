@@ -25,12 +25,18 @@ class ISOLATION_API IInteractionInterface
 public:
 
 	UFUNCTION()
-	virtual void Focus() {}
+	virtual void Focus(bool HasFuel) {}
 
 	UFUNCTION()
 	virtual void Unfocus() {}
 
 	UFUNCTION()
 	virtual void Pickup(USceneComponent* AttachLocation) {}
+
+	UFUNCTION()
+	virtual bool CheckTag(FName TagToCheck) { return false; }
+
+	UFUNCTION()
+	virtual void Interact(bool HasFuel) {}
 
 };

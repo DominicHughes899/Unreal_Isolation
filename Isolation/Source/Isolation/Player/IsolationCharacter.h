@@ -71,6 +71,8 @@ protected:
 
 	IInteractionInterface* FocusedInteractable;
 
+	// ==== Carrying ====
+	bool CarryingFuel = false;
 
 public:	
 	// Called every frame

@@ -18,6 +18,22 @@ void AMainLight::BeginPlay()
 	
 }
 
+void AMainLight::Focus(bool HasFuel)
+{
+	OnFocus(HasFuel);
+
+}
+
+void AMainLight::Unfocus()
+{
+	OnUnfocus();
+}
+
+bool AMainLight::CheckTag(FName TagToCheck)
+{
+	return ActorHasTag(TagToCheck);
+}
+
 // Called every frame
 void AMainLight::Tick(float DeltaTime)
 {

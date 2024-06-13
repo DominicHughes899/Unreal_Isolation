@@ -74,24 +74,37 @@ void AIsolationCharacter::Look(const FInputActionValue& Value)
 
 void AIsolationCharacter::Interact(const FInputActionValue& Value)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Interact Triggered"));
-
 	if (FocusedInteractable)
 	{
-		FocusedInteractable->Pickup(AttachLocation);
-		FocusedInteractable->Unfocus();
+		UE_LOG(LogTemp, Warning, TEXT("Interact Triggered"));
 
-		if (InteractablesInRange.Num() > 0)
+		if (FocusedInteractable->CheckTag(FName("MainLight")))
 		{
-			InteractablesInRange.Remove(FocusedInteractable);
-			FocusedInteractable = nullptr;
+			UE_LOG(LogTemp, Warning, TEXT("LightHouse Interacted"));
 		}
+		else
+		{
+			FocusedInteractable->Pickup(AttachLocation);
+			FocusedInteractable->Unfocus();
+
+			CarryingFuel = true;
+
+			if (InteractablesInRange.Num() > 0)
+			{
+				InteractablesInRange.Remove(FocusedInteractable);
+				FocusedInteractable = nullptr;
+			}
+		}
+		
 	}
 
 }
 
+// ==== bind functions ====
 void AIsolationCharacter::OnOverlapBegin(AActor* OverlappedActor, AActor* OtherActor)
 {
+	UE_LOG(LogTemp, Warning, TEXT("OverlapStarted"));
+
 	// Add Interactable to array
 	if (IInteractionInterface* OverlappedInterface = Cast<IInteractionInterface>(OtherActor))
 	{
@@ -102,7 +115,7 @@ void AIsolationCharacter::OnOverlapBegin(AActor* OverlappedActor, AActor* OtherA
 		if (InteractablesInRange.Num() > 0)
 		{
 			FocusedInteractable = InteractablesInRange[0];
-			FocusedInteractable->Focus();
+			FocusedInteractable->Focus(CarryingFuel);
 		}
 	}
 }
@@ -128,7 +141,7 @@ void AIsolationCharacter::OnOverlapEnd(AActor* OverlappedActor, AActor* OtherAct
 		if (InteractablesInRange.Num() > 0)
 		{
 			FocusedInteractable = InteractablesInRange[0];
-			FocusedInteractable->Focus();
+			FocusedInteractable->Focus(CarryingFuel);
 		}
 	}
 }
