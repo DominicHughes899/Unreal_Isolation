@@ -39,6 +39,13 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnDrainFuel(float CurrentLevel);							 // For UI overlay update
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnFuelEmpty();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnFuelRefill();
+
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -49,6 +56,8 @@ private:
 
 	float MaxFuel = 1.f;
 	float FuelLevel = 0.7f;
+
+	bool LightOn = true;
 
 	UPROPERTY(EditAnywhere)
 	float FuelEfficiency = 0.02f;

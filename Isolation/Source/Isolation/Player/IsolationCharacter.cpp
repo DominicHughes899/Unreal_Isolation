@@ -82,12 +82,16 @@ void AIsolationCharacter::Interact(const FInputActionValue& Value)
 		{
 			if (CarryingFuel)
 			{
+				OnUseFuel();
+
 				CarryingFuel = false;
 
 				FocusedInteractable->FillFuel();
 				HeldInteractable->DestroyActor();
 
 				FocusedInteractable->Unfocus();
+
+
 			}
 		}
 		else

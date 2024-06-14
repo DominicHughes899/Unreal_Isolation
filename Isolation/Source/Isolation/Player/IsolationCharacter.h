@@ -72,6 +72,10 @@ protected:
 	IInteractionInterface* FocusedInteractable;
 	IInteractionInterface* HeldInteractable;
 
+	// ==== Blueprint Functions ====
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnUseFuel();							// For sound cue
+
 	// ==== Carrying ====
 	bool CarryingFuel = false;
 
