@@ -94,6 +94,10 @@ void AIsolationCharacter::Interact(const FInputActionValue& Value)
 
 			}
 		}
+		else if(FocusedInteractable->CheckTag(FName("Mechanism")))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Mechanism Interaction"))
+		}
 		else
 		{
 			if(!CarryingFuel)
@@ -158,8 +162,10 @@ void AIsolationCharacter::OnOverlapEnd(AActor* OverlappedActor, AActor* OtherAct
 		{
 			FocusedInteractable = InteractablesInRange[0];
 			FocusedInteractable->Focus(CarryingFuel);
-
-			
+		}
+		else
+		{
+			FocusedInteractable = nullptr;
 		}
 	}
 }
