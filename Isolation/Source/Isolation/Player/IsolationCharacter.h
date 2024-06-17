@@ -12,6 +12,8 @@
 class UInputMappingContext;
 class UInputAction;
 
+class IInteractionInterface;
+
 UCLASS()
 class ISOLATION_API AIsolationCharacter : public ACharacter
 {
@@ -24,6 +26,13 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	// ==== Components ====
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UBoxComponent* InteractionDetectionBox;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class USceneComponent* AttachLocation;
 
 	// ==== Input Handlers ====
 	// Set in BP
@@ -39,6 +48,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	UInputAction* LookAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
+	UInputAction* InteractAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
+	UInputAction* StopInteractAction;
+
 	// ==== Input Functions ====
 	void MoveForward(const FInputActionValue& Value);
 
@@ -46,6 +61,40 @@ protected:
 
 	void Look(const FInputActionValue& Value);
 
+	void Interact(const FInputActionValue& Value);
+
+	void StopInteraction(const FInputActionValue& Value);
+
+	// ==== Interaction ====
+	UFUNCTION()
+	void OnOverlapBegin(AActor* OverlappedActor, AActor* OtherActor);
+
+	UFUNCTION()
+	void OnOverlapEnd(AActor* OverlappedActor, AActor* OtherActor);
+
+	TArray<IInteractionInterface*> InteractablesInRange;
+
+	IInteractionInterface* FocusedInteractable;
+	IInteractionInterface* HeldInteractable;
+
+	// Hold interaction function
+	void BeginInteraction(IInteractionInterface* Interactable);
+	void TickInteraction(float DeltaTime);
+	void EndInteraction(bool InteractionCompleted);
+
+	IInteractionInterface* TimedInteractable;
+	bool IsInteracting = false;
+	float InteractionTimer = 0.f;
+
+	UPROPERTY(EditAnywhere)
+	float InteractionTime = 2.f;
+
+	// ==== Blueprint Functions ====
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnUseFuel();							// For sound cue
+
+	// ==== Carrying ====
+	bool CarryingFuel = false;
 
 public:	
 	// Called every frame

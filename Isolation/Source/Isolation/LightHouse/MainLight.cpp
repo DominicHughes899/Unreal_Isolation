@@ -18,10 +18,63 @@ void AMainLight::BeginPlay()
 	
 }
 
+void AMainLight::Focus(bool HasFuel)
+{
+	OnFocus(HasFuel);
+
+}
+
+void AMainLight::Unfocus()
+{
+	OnUnfocus();
+}
+
+bool AMainLight::CheckTag(FName TagToCheck)
+{
+	return ActorHasTag(TagToCheck);
+}
+
+void AMainLight::FillFuel()
+{
+	if (FuelLevel == 0)
+	{
+		OnFuelRefill();
+		LightOn = true;
+	}
+
+	FuelLevel += 0.4f;
+
+	if (FuelLevel >= 1.f)
+	{
+		FuelLevel = 1.f;
+	}
+}
+
 // Called every frame
 void AMainLight::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (LightOn)
+	{
+		DrainFuel(DeltaTime);
+	}
+}
+
+void AMainLight::DrainFuel(float DeltaTime)
+{
+	if (FuelLevel >= 0)
+	{
+		FuelLevel -= DeltaTime * FuelEfficiency;
+	}
+	else
+	{
+		FuelLevel = 0;
+
+		LightOn = false;
+		OnFuelEmpty();
+	}
+
+	OnDrainFuel(FuelLevel);
 }
 
