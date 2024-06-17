@@ -96,7 +96,14 @@ void AIsolationCharacter::Interact(const FInputActionValue& Value)
 		}
 		else if(FocusedInteractable->CheckTag(FName("Mechanism")))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Mechanism Interaction"))
+			BeginInteraction(FocusedInteractable);
+
+			if (InteractablesInRange.Num() > 0)
+			{
+				FocusedInteractable->Unfocus();
+				InteractablesInRange.Remove(FocusedInteractable);
+				FocusedInteractable = nullptr;
+			}
 		}
 		else
 		{
@@ -118,6 +125,14 @@ void AIsolationCharacter::Interact(const FInputActionValue& Value)
 		
 	}
 
+}
+
+void AIsolationCharacter::StopInteraction(const FInputActionValue& Value)
+{
+	if (IsInteracting)
+	{
+		EndInteraction(false);
+	}
 }
 
 // ==== bind functions ====
@@ -170,11 +185,66 @@ void AIsolationCharacter::OnOverlapEnd(AActor* OverlappedActor, AActor* OtherAct
 	}
 }
 
+
+// Timed Interaction functions
+void AIsolationCharacter::BeginInteraction(IInteractionInterface* Interactable)
+{
+	TimedInteractable = FocusedInteractable;
+
+	IsInteracting = true;
+
+	UE_LOG(LogTemp, Warning, TEXT("Begun"));
+
+	if (TimedInteractable)
+	{
+		// Tell focused to initiate
+		TimedInteractable->BeginInteraction();
+	}
+}
+
+void AIsolationCharacter::TickInteraction(float DeltaTime)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Ticking %f"), InteractionTimer);
+
+	InteractionTimer += DeltaTime;
+
+	if (InteractionTimer >= InteractionTime)
+	{
+		EndInteraction(true);
+	}
+}
+
+void AIsolationCharacter::EndInteraction(bool InteractionCompleted)
+{
+	UE_LOG(LogTemp, Warning, TEXT("End %d"), InteractionCompleted);
+
+	if (InteractionCompleted && TimedInteractable)
+	{
+		// Tell focused it's completed
+		TimedInteractable->EndInteraction(true);
+	}
+	else if(TimedInteractable)
+	{
+		TimedInteractable->EndInteraction(false);
+		// Tell focused it's not 
+	}
+
+	TimedInteractable = nullptr;
+
+	InteractionTimer = 0.f;
+
+	IsInteracting = false;
+}
+
 // Called every frame
 void AIsolationCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (IsInteracting)
+	{
+		TickInteraction(DeltaTime);
+	}
 }
 
 // Called to bind functionality to input
@@ -188,6 +258,7 @@ void AIsolationCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 		EnhancedInputComponent->BindAction(MoveRightAction, ETriggerEvent::Triggered, this, &AIsolationCharacter::MoveRight);
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AIsolationCharacter::Look);
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AIsolationCharacter::Interact);
+		EnhancedInputComponent->BindAction(StopInteractAction, ETriggerEvent::Triggered, this, &AIsolationCharacter::StopInteraction);
 	}
 }
 

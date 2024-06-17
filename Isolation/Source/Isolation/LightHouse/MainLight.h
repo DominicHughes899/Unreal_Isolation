@@ -45,6 +45,9 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnFuelRefill();
 
+	// ==== Blueprint Properties ====
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float FuelEfficiency = 0.02f;
 
 public:	
 	// Called every frame
@@ -59,7 +62,6 @@ private:
 
 	bool LightOn = true;
 
-	UPROPERTY(EditAnywhere)
-	float FuelEfficiency = 0.02f;
+
 
 };

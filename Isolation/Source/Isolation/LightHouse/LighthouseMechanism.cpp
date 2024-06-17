@@ -16,11 +16,12 @@ void ALighthouseMechanism::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	SetRandomBreakTime();
 }
 
 void ALighthouseMechanism::Focus(bool HasFuel)
 {
-	if (!HasFuel)
+	if (!HasFuel && IsBroken)
 	{
 		OnFocus();
 	}
@@ -31,10 +32,49 @@ void ALighthouseMechanism::Unfocus()
 	OnUnfocus();
 }
 
+void ALighthouseMechanism::EndInteraction(bool Completed)
+{
+	OnEndInteraction();
+
+	if (Completed)
+	{
+		IsBroken = false;
+		BreakTimer = 0.f;
+		SetRandomBreakTime();
+
+		OnFixed();
+	}
+}
+
+void ALighthouseMechanism::Repair()
+{
+	
+}
+
 // Called every frame
 void ALighthouseMechanism::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (!IsBroken)
+	{
+		TickTimer(DeltaTime);
+	}
+}
+
+void ALighthouseMechanism::SetRandomBreakTime()
+{
+	BreakTime = FMath::RandRange(MinTime, MaxTime);
+}
+
+void ALighthouseMechanism::TickTimer(float DeltaTime)
+{
+	BreakTimer += DeltaTime;
+
+	if (BreakTimer >= BreakTime)
+	{
+		IsBroken = true;
+		OnBroken();
+	}
 }
 

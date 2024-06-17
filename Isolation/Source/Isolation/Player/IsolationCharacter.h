@@ -51,6 +51,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	UInputAction* InteractAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
+	UInputAction* StopInteractAction;
+
 	// ==== Input Functions ====
 	void MoveForward(const FInputActionValue& Value);
 
@@ -59,6 +62,8 @@ protected:
 	void Look(const FInputActionValue& Value);
 
 	void Interact(const FInputActionValue& Value);
+
+	void StopInteraction(const FInputActionValue& Value);
 
 	// ==== Interaction ====
 	UFUNCTION()
@@ -71,6 +76,18 @@ protected:
 
 	IInteractionInterface* FocusedInteractable;
 	IInteractionInterface* HeldInteractable;
+
+	// Hold interaction function
+	void BeginInteraction(IInteractionInterface* Interactable);
+	void TickInteraction(float DeltaTime);
+	void EndInteraction(bool InteractionCompleted);
+
+	IInteractionInterface* TimedInteractable;
+	bool IsInteracting = false;
+	float InteractionTimer = 0.f;
+
+	UPROPERTY(EditAnywhere)
+	float InteractionTime = 2.f;
 
 	// ==== Blueprint Functions ====
 	UFUNCTION(BlueprintImplementableEvent)

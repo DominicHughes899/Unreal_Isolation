@@ -40,6 +40,15 @@ public:
 	virtual void FillFuel() {}
 
 	UFUNCTION()
+	virtual void BeginInteraction() {}
+
+	UFUNCTION()
+	virtual void EndInteraction(bool Completed) {}
+
+	UFUNCTION()
+	virtual void Repair() {}
+
+	UFUNCTION()
 	virtual void DestroyActor() {}
 
 };
