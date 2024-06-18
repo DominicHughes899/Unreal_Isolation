@@ -53,12 +53,19 @@ void AIsolationCharacter::BeginPlay()
 // ==== Input Functions ====
 void AIsolationCharacter::MoveForward(const FInputActionValue& Value)
 {
-	AddMovementInput(GetActorForwardVector(), Value.Get<float>());
+	if (abs(Value.Get<float>()) >= 0.1f)
+	{
+		AddMovementInput(GetActorForwardVector(), Value.Get<float>());
+	}
+	
 }
 
 void AIsolationCharacter::MoveRight(const FInputActionValue& Value)
 {
-	AddMovementInput(GetActorRightVector(), Value.Get<float>());
+	if (abs(Value.Get<float>()) >= 0.1f)
+	{
+		AddMovementInput(GetActorRightVector(), Value.Get<float>());
+	}
 }
 
 void AIsolationCharacter::Look(const FInputActionValue& Value)
@@ -67,8 +74,14 @@ void AIsolationCharacter::Look(const FInputActionValue& Value)
 
 	if (Controller != nullptr)
 	{
-		AddControllerYawInput(-LookAxisVector.X);
-		AddControllerPitchInput(LookAxisVector.Y);
+		if (abs(LookAxisVector.X) >= .1f)
+		{
+			AddControllerYawInput(-LookAxisVector.X * 1.5);
+		}
+		if (abs(LookAxisVector.Y) >= .1f)
+		{
+			AddControllerPitchInput(LookAxisVector.Y * 1.5);
+		}
 	}
 }
 
@@ -94,7 +107,7 @@ void AIsolationCharacter::Interact(const FInputActionValue& Value)
 
 			}
 		}
-		else if(FocusedInteractable->CheckTag(FName("Mechanism")))
+		else if (FocusedInteractable->CheckTag(FName("Mechanism")))
 		{
 			BeginInteraction(FocusedInteractable);
 
@@ -104,6 +117,13 @@ void AIsolationCharacter::Interact(const FInputActionValue& Value)
 				InteractablesInRange.Remove(FocusedInteractable);
 				FocusedInteractable = nullptr;
 			}
+		}
+		else if (FocusedInteractable->CheckTag(FName("Relic")))
+		{
+			FocusedInteractable->DestroyActor();
+
+			InteractablesInRange.Remove(FocusedInteractable);
+			FocusedInteractable = nullptr;
 		}
 		else
 		{
@@ -204,8 +224,6 @@ void AIsolationCharacter::BeginInteraction(IInteractionInterface* Interactable)
 
 void AIsolationCharacter::TickInteraction(float DeltaTime)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Ticking %f"), InteractionTimer);
-
 	InteractionTimer += DeltaTime;
 
 	if (InteractionTimer >= InteractionTime)
@@ -216,7 +234,6 @@ void AIsolationCharacter::TickInteraction(float DeltaTime)
 
 void AIsolationCharacter::EndInteraction(bool InteractionCompleted)
 {
-	UE_LOG(LogTemp, Warning, TEXT("End %d"), InteractionCompleted);
 
 	if (InteractionCompleted && TimedInteractable)
 	{
