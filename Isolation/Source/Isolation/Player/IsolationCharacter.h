@@ -54,6 +54,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	UInputAction* StopInteractAction;
 
+	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = Input)
+	UInputAction* ResetLocationAction;
+
 	// ==== Input Functions ====
 	void MoveForward(const FInputActionValue& Value);
 
@@ -64,6 +67,8 @@ protected:
 	void Interact(const FInputActionValue& Value);
 
 	void StopInteraction(const FInputActionValue& Value);
+
+	void ResetLocation(const FInputActionValue& Value) { UE_LOG(LogTemp, Warning, TEXT("Resetting"));  SetActorLocation(ResetLocationVector); }
 
 	// ==== Interaction ====
 	UFUNCTION()
@@ -95,6 +100,9 @@ protected:
 
 	// ==== Carrying ====
 	bool CarryingFuel = false;
+
+	UPROPERTY(EditAnywhere)
+	FVector ResetLocationVector;
 
 public:	
 	// Called every frame

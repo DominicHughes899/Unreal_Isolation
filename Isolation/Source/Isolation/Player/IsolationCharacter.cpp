@@ -276,6 +276,7 @@ void AIsolationCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AIsolationCharacter::Look);
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AIsolationCharacter::Interact);
 		EnhancedInputComponent->BindAction(StopInteractAction, ETriggerEvent::Triggered, this, &AIsolationCharacter::StopInteraction);
+		EnhancedInputComponent->BindAction(ResetLocationAction, ETriggerEvent::Triggered, this, &AIsolationCharacter::ResetLocation);
 	}
 }
 
