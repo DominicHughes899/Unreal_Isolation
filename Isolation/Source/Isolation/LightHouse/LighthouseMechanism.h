@@ -51,6 +51,9 @@ protected:
 	
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnEndInteraction();
+
+	UFUNCTION(BlueprintCallable)
+	void SetShouldBreak(bool NewShouldBreak) { ShouldBreak = NewShouldBreak; }
 	
 
 	// ==== Blueprint Properties ====
@@ -73,6 +76,7 @@ private:
 	void SetRandomBreakTime();
 	void TickTimer(float DeltaTime);
 
+	bool ShouldBreak = true;
 
 
 	float BreakTimer = 0.f;

@@ -42,7 +42,7 @@ void AMainLight::FillFuel()
 		LightOn = true;
 	}
 
-	FuelLevel += 0.4f;
+	FuelLevel += 0.8f;
 
 	if (FuelLevel >= 1.f)
 	{
