@@ -67,9 +67,12 @@ void ALighthouseMechanism::SetRandomBreakTime()
 	BreakTime = FMath::RandRange(MinTime, MaxTime);
 }
 
-void ALighthouseMechanism::TickTimer(float DeltaTime)
+void ALighthouseMechanism::TickTimer(float DeltaTime)\
 {
-	BreakTimer += DeltaTime;
+	if (ShouldBreak)
+	{
+		BreakTimer += DeltaTime;
+	}  
 
 	if (BreakTimer >= BreakTime)
 	{

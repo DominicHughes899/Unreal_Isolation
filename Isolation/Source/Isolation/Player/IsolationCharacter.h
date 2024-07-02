@@ -57,6 +57,9 @@ protected:
 	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = Input)
 	UInputAction* ResetLocationAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
+	UInputAction* SprintAction;
+
 	// ==== Input Functions ====
 	void MoveForward(const FInputActionValue& Value);
 
@@ -69,6 +72,8 @@ protected:
 	void StopInteraction(const FInputActionValue& Value);
 
 	void ResetLocation(const FInputActionValue& Value) { UE_LOG(LogTemp, Warning, TEXT("Resetting"));  SetActorLocation(ResetLocationVector); }
+
+	void EnableSprint(const FInputActionValue& Value);
 
 	// ==== Interaction ====
 	UFUNCTION()
@@ -98,11 +103,46 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnUseFuel();							// For sound cue
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void ShowStamina();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void HideStamina();
+
 	// ==== Carrying ====
 	bool CarryingFuel = false;
 
 	UPROPERTY(EditAnywhere)
 	FVector ResetLocationVector;
+
+	// ==== Sprinting ====
+	void DisableSprint();
+	void StaminaTick(float DeltaTime);
+	void TiredTick(float DeltaTime);
+
+	void FadeUIin();
+	void FadeUIOut();
+
+	bool IsSprinting = false;
+	bool IsTired = false;
+	bool StaminaShouldTick = false;
+	bool RechargePaused = false;
+	bool IsUIVisible = false;
+
+	float MaxStamina = 100.f;
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	float Stamina = MaxStamina;
+	
+	// Recharge 
+	float StaminaDecayRate = 25.f;
+	float StaminaRechargeRate = 20.f;
+	float StaminaRechargePauseTimer = 0.f;
+	float StaminaRechargePauseTime = 0.8f;
+
+	// Tired
+	float StaminaEmptyRefillTime = 6.f;
+	float StaminaEmptyRefillTimer = 0.f;
 
 public:	
 	// Called every frame

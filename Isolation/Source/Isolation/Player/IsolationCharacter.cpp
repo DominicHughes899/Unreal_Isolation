@@ -9,6 +9,8 @@
 
 #include "Components/BoxComponent.h"
 
+#include "GameFramework/CharacterMovementComponent.h"
+
 #include "../Interface/InteractionInterface.h"
 
 // Sets default values
@@ -76,11 +78,11 @@ void AIsolationCharacter::Look(const FInputActionValue& Value)
 	{
 		if (abs(LookAxisVector.X) >= .1f)
 		{
-			AddControllerYawInput(-LookAxisVector.X * 1.5);
+			AddControllerYawInput(-LookAxisVector.X * 0.4f);
 		}
 		if (abs(LookAxisVector.Y) >= .1f)
 		{
-			AddControllerPitchInput(LookAxisVector.Y * 1.5);
+			AddControllerPitchInput(LookAxisVector.Y * 0.4f);
 		}
 	}
 }
@@ -152,6 +154,22 @@ void AIsolationCharacter::StopInteraction(const FInputActionValue& Value)
 	if (IsInteracting)
 	{
 		EndInteraction(false);
+	}
+}
+
+void AIsolationCharacter::EnableSprint(const FInputActionValue& Value)
+{
+	if (Value.Get<bool>() && !IsTired)
+	{
+		FadeUIin();
+
+		IsSprinting = true;
+		StaminaShouldTick = true;
+		GetCharacterMovement()->MaxWalkSpeed = 600.f;
+	}
+	else
+	{
+		DisableSprint();
 	}
 }
 
@@ -253,6 +271,117 @@ void AIsolationCharacter::EndInteraction(bool InteractionCompleted)
 	IsInteracting = false;
 }
 
+// Sprinting functions
+void AIsolationCharacter::DisableSprint()
+{
+	IsSprinting = false;
+	GetCharacterMovement()->MaxWalkSpeed = 350.f;
+
+	if (IsTired)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = 200.f;
+	}
+}
+
+void AIsolationCharacter::StaminaTick(float DeltaTime)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Stamina: %f"), Stamina);
+
+	// Consume Stamina
+	if (IsSprinting && GetVelocity().Length() >= 40.f)
+	{
+
+		if (!RechargePaused || StaminaRechargePauseTimer != 0.f)
+		{
+			RechargePaused = true;
+			StaminaRechargePauseTimer = 0.f;
+		}
+
+		Stamina -= StaminaDecayRate * DeltaTime; // Consume Stamina
+		
+		if (Stamina <= 0) // Initiate Tired Sequence
+		{
+			Stamina = 0;
+			IsTired = true;
+			DisableSprint();
+		}
+	}
+
+	// Recharge Stamina
+	else if						// Recharge noramlly 
+		(
+		!RechargePaused &&										// if not paused
+		(!IsSprinting || GetVelocity().Length() <= 500.f) &&	// if not sprinting 
+		!IsTired &&												// if not tired
+		Stamina <= MaxStamina									// if necessary
+		)
+	{
+		Stamina += StaminaRechargeRate * DeltaTime;
+		if (Stamina >= MaxStamina)
+		{
+			Stamina = MaxStamina;
+			StaminaShouldTick = false;
+			FadeUIOut();
+		}
+	}
+	
+	// Recharge timer
+	if (RechargePaused && GetVelocity().Length() <= 500.f || !IsSprinting)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("RECHARGE TIMER"));
+
+		StaminaRechargePauseTimer += DeltaTime;
+		if (StaminaRechargePauseTimer >= StaminaRechargePauseTime)
+		{
+			StaminaRechargePauseTimer = 0.f;
+			RechargePaused = false;
+		}
+	}
+}
+
+void AIsolationCharacter::TiredTick(float DeltaTime)
+{
+	UE_LOG(LogTemp, Warning, TEXT("IsTired Timer: %f"), StaminaEmptyRefillTimer);
+
+	StaminaEmptyRefillTimer += DeltaTime;
+	Stamina += 16.67 * DeltaTime;
+
+
+	if (StaminaEmptyRefillTimer >= StaminaEmptyRefillTime)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = 350.f;
+		StaminaEmptyRefillTimer = 0.f;
+		Stamina = MaxStamina;
+		IsTired = false;
+		
+		if (!IsSprinting)
+		{
+			FadeUIOut();
+		}
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("Stamina: %f"), Stamina);
+
+}
+
+void AIsolationCharacter::FadeUIin()
+{
+	if (!IsUIVisible )
+	{ 
+		ShowStamina(); 
+		IsUIVisible = true; 
+	}
+}
+
+void AIsolationCharacter::FadeUIOut()
+{
+	if (IsUIVisible && !IsSprinting)
+	{
+		HideStamina();
+		IsUIVisible = false;
+	}
+}
+
 // Called every frame
 void AIsolationCharacter::Tick(float DeltaTime)
 {
@@ -261,6 +390,16 @@ void AIsolationCharacter::Tick(float DeltaTime)
 	if (IsInteracting)
 	{
 		TickInteraction(DeltaTime);
+	}
+
+	if (StaminaShouldTick)
+	{
+		StaminaTick(DeltaTime);
+	}
+
+	if (IsTired)
+	{
+		TiredTick(DeltaTime);
 	}
 }
 
@@ -277,6 +416,7 @@ void AIsolationCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AIsolationCharacter::Interact);
 		EnhancedInputComponent->BindAction(StopInteractAction, ETriggerEvent::Triggered, this, &AIsolationCharacter::StopInteraction);
 		EnhancedInputComponent->BindAction(ResetLocationAction, ETriggerEvent::Triggered, this, &AIsolationCharacter::ResetLocation);
+		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Triggered, this, &AIsolationCharacter::EnableSprint);
 	}
 }
 
